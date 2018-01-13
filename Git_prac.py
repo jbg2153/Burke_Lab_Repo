@@ -9,3 +9,5 @@ to tag it with your name somehow.
 """
 
 print('Justin says, "Welcome to GIT."')
+
+print('Justin created a branch...and then merged it.')
