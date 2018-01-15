@@ -17,19 +17,12 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
               reactorType='cv'):
     #gas = ct.Solution('AramcoMech2.0.cti')
     # 'GRI30-1999.cti'
-    if 'AR' in speciesNames:
-        addBackin = 'AR'
-        speciesNames.remove('AR')
-    if 'Ar' in speciesNames:
-        addBackin = 'Ar'
-        speciesNames.remove('Ar')
-    if 'HE' in speciesNames:
-        addBackin = 'HE'
-        speciesNames.remove('HE')
-    if 'He' in speciesNames:
-        addBackin = 'He'
-        speciesNames.remove('He')
-            
+    
+    for s in ['Ar','AR','He','HE']:
+        if s in speciesNames:
+            addBackin = s
+            speciesNames.remove(s)
+            break
     
     
     gas = ct.Solution(ctiFile)
