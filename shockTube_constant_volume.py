@@ -58,9 +58,10 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
     
     
     if kinetic_sens==1 and bool(observables):
-        [shockTube.add_sensitivity_reaction(i) for i in xrange(gas.n_reactions)]
-        dfs = [pd.DataFrame() for x in xrange(len(observables))]
-        tempArray = [np.zeros(gas.n_reactions) for x in xrange(len(observables))]
+        [shockTube.add_sensitivity_reaction(i) for i in range(gas.n_reactions)]
+        dfs = [pd.DataFrame() for x in range(len(observables))]
+        tempArray = [np.zeros(gas.n_reactions) for x in range
+                     (len(observables))]
                 
     
     if physical_sens==1 and bool(observables):
@@ -69,12 +70,12 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
                       
         
     
-    columnNames = [shockTube.component_name(item) for item in xrange(shockTube.n_vars)]               
+    columnNames = [shockTube.component_name(item) for item in range(shockTube.n_vars)]               
     columnNames = ['time']+['pressure'] + columnNames
     timeHistory = pd.DataFrame(columns = columnNames)
     timeHistorytest= pd.DataFrame(columns = columnNames)
     timeHistorytest2= pd.DataFrame(columns = columnNames)
-    timeHistorytest4 = [pd.DataFrame(columns = columnNames) for item in xrange(len(physicalParamsSpecies))]
+    timeHistorytest4 = [pd.DataFrame(columns = columnNames) for item in range(len(physicalParamsSpecies))]
     
    
     t=initialTime
@@ -89,7 +90,7 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
         if kinetic_sens == 1 and bool(observables):
 
             newcounter = 0
-            for observable,reaction in itertools.product(observables,xrange(gas.n_reactions)):
+            for observable,reaction in itertools.product(observables,range(gas.n_reactions)):
                 tempArray[observables.index(observable)][reaction] = sim.sensitivity(observable, reaction)
                 newcounter +=1
                 
@@ -101,9 +102,9 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
         ksensIndex = [timeHistory['time'].as_matrix(),gas.reaction_equations(),observables]
    
     
-        numpyMatrixsksens = [dfs[dataframe].as_matrix() for dataframe in xrange(len(dfs))]
-        numpyMatrixsBsens = [numpyMatrixsksens[x]*(np.log(timeHistory['temperature'].as_matrix().flatten()))[:,np.newaxis] for x in xrange(len(numpyMatrixsksens))]
-        numpyMatrixsEsens = [numpyMatrixsksens[x]*(np.true_divide(-1,timeHistory['temperature'].as_matrix().flatten()))[:,np.newaxis] for x in xrange(len(numpyMatrixsksens))]
+        numpyMatrixsksens = [dfs[dataframe].as_matrix() for dataframe in range(len(dfs))]
+        numpyMatrixsBsens = [numpyMatrixsksens[x]*(np.log(timeHistory['temperature'].as_matrix().flatten()))[:,np.newaxis] for x in range(len(numpyMatrixsksens))]
+        numpyMatrixsEsens = [numpyMatrixsksens[x]*(np.true_divide(-1,timeHistory['temperature'].as_matrix().flatten()))[:,np.newaxis] for x in range(len(numpyMatrixsksens))]
         S = np.dstack(numpyMatrixsksens)
         Sa = S
         Sb = np.dstack(numpyMatrixsBsens)
@@ -115,7 +116,7 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
         dk=.01
         originalPsens = (timeHistory[observables]).applymap(np.log)
                         
-        for numOfPhyParams in xrange(len(physical_params)):
+        for numOfPhyParams in range(len(physical_params)):
             if physical_params[numOfPhyParams] == 'T':
                 gas2 = ct.Solution(ctiFile)
                 gas2.TPX = baseConditions[0]+dk,baseConditions[1],baseConditions[2]
@@ -150,12 +151,12 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
 
                 tempForInterp = timeHistorytest[observables]
             
-                tempForInterplstT = [tempForInterp.ix[:,x].values for x in xrange(tempForInterp.shape[1])]
+                tempForInterplstT = [tempForInterp.ix[:,x].values for x in range(tempForInterp.shape[1])]
                 
-                interpolatedData = [np.interp(timeHistory['time'].values,newTimeArray.values,tempForInterplstT[x]) for x in xrange(len(tempForInterplstT))]
+                interpolatedData = [np.interp(timeHistory['time'].values,newTimeArray.values,tempForInterplstT[x]) for x in range(len(tempForInterplstT))]
                 interpolatedTemperatureForMappingPhysicalSensT = [np.interp(timeHistory['time'].values,newTimeArray.values,temperatureForMappingPhysicalSensT)]
                 interpolatedPressureForMappingPhysicalSensT = [np.interp(timeHistory['time'].values,newTimeArray.values,pressureForMappingPhysicalSensT)]
-                interpolatedData = [pd.DataFrame(interpolatedData[x]) for x in xrange(len(interpolatedData))]
+                interpolatedData = [pd.DataFrame(interpolatedData[x]) for x in range(len(interpolatedData))]
                 interpolatedData = pd.concat(interpolatedData, axis=1,ignore_index=True)
                 
                 
@@ -168,7 +169,7 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
                 tempT = interpolatedData.applymap(np.log)
                 tempT.columns = observables
                 tempT = (originalPsens.subtract(tempT))/np.log(dk)
-                tempTlst = [tempT.ix[:,idx] for idx in xrange(tempT.shape[1])]
+                tempTlst = [tempT.ix[:,idx] for idx in range(tempT.shape[1])]
                 
                 
                 
@@ -206,14 +207,14 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
                 pressureForMappingPhysicalSensP = timeHistorytest2['pressure'].values
 
                 tempForInterp = timeHistorytest2[observables]
-                tempForInterplstP = [tempForInterp.ix[:,x].values for x in xrange(tempForInterp.shape[1])]
+                tempForInterplstP = [tempForInterp.ix[:,x].values for x in range(tempForInterp.shape[1])]
                                      
-                interpolatedData2 = [np.interp(timeHistory['time'].values,newTimeArray2.values,tempForInterplstP[x]) for x in xrange(len(tempForInterplstP))]
+                interpolatedData2 = [np.interp(timeHistory['time'].values,newTimeArray2.values,tempForInterplstP[x]) for x in range(len(tempForInterplstP))]
                 interpolatedTemperatureForMappingPhysicalSensP = [np.interp(timeHistory['time'].values,newTimeArray2.values,temperatureForMappingPhysicalSensP)]
                 
                 
                 interpolatedPressureForMappingPhysicalSensP = [np.interp(timeHistory['time'].values,newTimeArray2.values,pressureForMappingPhysicalSensP)]                     
-                interpolatedData2 = [pd.DataFrame(interpolatedData2[x]) for x in xrange(len(interpolatedData2))]
+                interpolatedData2 = [pd.DataFrame(interpolatedData2[x]) for x in range(len(interpolatedData2))]
                 interpolatedData2 = pd.concat(interpolatedData2,axis=1,ignore_index=True)
                 
                 concentrationOfAbsorbanceObservablesForSensP = interpolatedData2
@@ -224,7 +225,7 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
                 tempP = interpolatedData2.applymap(np.log)
                 tempP.columns = observables
                 tempP = (originalPsens.subtract(tempP))/np.log(dk)
-                tempPlst = [tempP.ix[:,idx] for idx in xrange(tempP.shape[1])]
+                tempPlst = [tempP.ix[:,idx] for idx in range(tempP.shape[1])]
                                      
         
                 
@@ -268,65 +269,65 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
                 
                 
                     
-                newTimeArrays3 = [timeHistorytest4[simulationNumber]['time'] for simulationNumber in xrange(len(timeHistorytest4))]
-                temperatureForMappingPhysicalSensX = [timeHistorytest4[simulationNumber]['temperature'] for simulationNumber in xrange(len(timeHistorytest4))]
-                pressureForMappingPhysicalSensX = [timeHistorytest4[simulationNumber]['pressure'] for simulationNumber in xrange(len(timeHistorytest4))]                
-                tempForInterps = [timeHistorytest4[simulationNumber][observables] for simulationNumber in xrange(len(timeHistorytest4))]
+                newTimeArrays3 = [timeHistorytest4[simulationNumber]['time'] for simulationNumber in range(len(timeHistorytest4))]
+                temperatureForMappingPhysicalSensX = [timeHistorytest4[simulationNumber]['temperature'] for simulationNumber in range(len(timeHistorytest4))]
+                pressureForMappingPhysicalSensX = [timeHistorytest4[simulationNumber]['pressure'] for simulationNumber in range(len(timeHistorytest4))]                
+                tempForInterps = [timeHistorytest4[simulationNumber][observables] for simulationNumber in range(len(timeHistorytest4))]
                 
                 
-                tempForInterplstXs = [[] for x in xrange(len(timeHistorytest4))]
-                for simulationNumber in xrange(len(timeHistorytest4)):
-                    for  x in xrange(tempForInterps[simulationNumber].shape[1]):
+                tempForInterplstXs = [[] for x in range(len(timeHistorytest4))]
+                for simulationNumber in range(len(timeHistorytest4)):
+                    for  x in range(tempForInterps[simulationNumber].shape[1]):
                         tempForInterplstXs[simulationNumber].append(tempForInterps[simulationNumber].ix[:,x].values)
                         
 
                 
-                interpolatedData3 = [[] for x in xrange(len(timeHistorytest4))]
+                interpolatedData3 = [[] for x in range(len(timeHistorytest4))]
                 interpolatedTemperatureForMappingPhysicalSensX = []
                 interpolatedPressureForMappingPhysicalSensX = [] 
                
                                      
-                for simulationNumber in xrange(len(timeHistorytest4)):
-                    for x in xrange(tempForInterps[simulationNumber].shape[1]):
+                for simulationNumber in range(len(timeHistorytest4)):
+                    for x in range(tempForInterps[simulationNumber].shape[1]):
                         interpolatedData3[simulationNumber].append(np.interp(timeHistory['time'].values,newTimeArrays3[simulationNumber].values,tempForInterplstXs[simulationNumber][x]))
-                for simulationNumber in xrange(len(timeHistorytest4)):
+                for simulationNumber in range(len(timeHistorytest4)):
                     interpolatedTemperatureForMappingPhysicalSensX.append(np.interp(timeHistory['time'].values,newTimeArrays3[simulationNumber].values,temperatureForMappingPhysicalSensX[simulationNumber]))
                 
-                for simulationNumber in xrange(len(timeHistorytest4)):
+                for simulationNumber in range(len(timeHistorytest4)):
                     interpolatedPressureForMappingPhysicalSensX.append(np.interp(timeHistory['time'].values,newTimeArrays3[simulationNumber].values,pressureForMappingPhysicalSensX[simulationNumber]))                        
                         
-                interpolatedDataFrames = [[] for x in xrange(len(timeHistorytest4))]
+                interpolatedDataFrames = [[] for x in range(len(timeHistorytest4))]
 
                 #print(interpolatedData3)
-                for simulationNumber in xrange(len(timeHistorytest4)):
-                    for x in xrange(tempForInterps[simulationNumber].shape[1]):
+                for simulationNumber in range(len(timeHistorytest4)):
+                    for x in range(tempForInterps[simulationNumber].shape[1]):
                         interpolatedDataFrames[simulationNumber].append(pd.DataFrame(interpolatedData3[simulationNumber][x]))
                 
-                interpolatedDataFrames = [pd.concat(interpolatedDataFrames[simulationNumber],axis=1,ignore_index=True) for simulationNumber in xrange(len(timeHistorytest4))]
+                interpolatedDataFrames = [pd.concat(interpolatedDataFrames[simulationNumber],axis=1,ignore_index=True) for simulationNumber in range(len(timeHistorytest4))]
                 concentrationOfAbsorbanceObservablesForSensX = interpolatedDataFrames
                 
-                for simulationNumber in xrange(len(timeHistorytest4)):
+                for simulationNumber in range(len(timeHistorytest4)):
                     concentrationOfAbsorbanceObservablesForSensX[simulationNumber].columns = observables
                     
                     
-                interpolatedDataFrames = [interpolatedDataFrames[simulationNumber].applymap(np.log) for simulationNumber in xrange(len(timeHistorytest4))]
-                for simulationNumber in xrange(len(timeHistorytest4)):
+                interpolatedDataFrames = [interpolatedDataFrames[simulationNumber].applymap(np.log) for simulationNumber in range(len(timeHistorytest4))]
+                for simulationNumber in range(len(timeHistorytest4)):
                     interpolatedDataFrames[simulationNumber].columns = observables
-                interpolatedDataFrames = [(originalPsens.subtract(interpolatedDataFrames[simulationNumber]))/np.log(dk) for simulationNumber in xrange(len(timeHistorytest4))]
+                interpolatedDataFrames = [(originalPsens.subtract(interpolatedDataFrames[simulationNumber]))/np.log(dk) for simulationNumber in range(len(timeHistorytest4))]
                                           
-                tempXlst = [[] for x in xrange(len(timeHistorytest4))]
-                for simulationNumber in xrange(len(timeHistorytest4)):
-                    for x in xrange(interpolatedDataFrames[simulationNumber].shape[1]):
+                tempXlst = [[] for x in range(len(timeHistorytest4))]
+                for simulationNumber in range(len(timeHistorytest4)):
+                    for x in range(interpolatedDataFrames[simulationNumber].shape[1]):
                         tempXlst[simulationNumber].append(interpolatedDataFrames[simulationNumber].ix[:,x])
                         
               
-                tempXlsts = [[] for x in xrange(len(observables))]
+                tempXlsts = [[] for x in range(len(observables))]
                              
-                for lengthOfList in xrange(len(observables)):
-                    for dfInList in xrange(len(timeHistorytest4)):
+                for lengthOfList in range(len(observables)):
+                    for dfInList in range(len(timeHistorytest4)):
                         tempXlsts[lengthOfList].append(tempXlst[dfInList][lengthOfList])
                         
-                tempXlsts = [pd.concat(tempXlsts[simulationNumber],axis=1,ignore_index=True) for simulationNumber in xrange(len(tempXlsts))]
+                tempXlsts = [pd.concat(tempXlsts[simulationNumber],axis=1,ignore_index=True) for simulationNumber in range(len(tempXlsts))]
                 
  
 
@@ -339,8 +340,8 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
         if 'T' in physical_params and 'P' in physical_params and 'X' in physical_params:
             t = [tempTlst,tempPlst,tempXlsts]
             psensIndex = [timeHistory['time'].as_matrix(),['T','P'] + physicalParamsSpecies ,observables]
-            psensdfs = [pd.concat([t[0][x],t[1][x],t[2][x]],ignore_index = True , axis = 1) for x in xrange(len(tempXlsts))]
-            numpyMatrixspsens = [psensdfs[dataframe].as_matrix() for dataframe in xrange(len(psensdfs))]
+            psensdfs = [pd.concat([t[0][x],t[1][x],t[2][x]],ignore_index = True , axis = 1) for x in range(len(tempXlsts))]
+            numpyMatrixspsens = [psensdfs[dataframe].as_matrix() for dataframe in range(len(psensdfs))]
             interpolatedTemperatureForMappingPhysicalSens = [interpolatedTemperatureForMappingPhysicalSensT + interpolatedTemperatureForMappingPhysicalSensP + interpolatedTemperatureForMappingPhysicalSensX]
             interpolatedPressureForMappingPhysicalSens = [interpolatedPressureForMappingPhysicalSensT + interpolatedPressureForMappingPhysicalSensP + interpolatedPressureForMappingPhysicalSensX] 
             concentrationOfAbsorbanceObservablesForSens = [concentrationOfAbsorbanceObservablesForSensT+concentrationOfAbsorbanceObservablesForSensP+concentrationOfAbsorbanceObservablesForSensX]
@@ -350,8 +351,8 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
         elif 'T' in physical_params and 'P' in physical_params:
             t = [tempTlst,tempPlst]
             psensIndex = [timeHistory['time'].as_matrix(),['T','P'],observables]
-            psensdfs = [pd.concat([t[0][x],t[1][x]],ignore_index=True,axis = 1) for x in xrange(len(tempTlst))]                
-            numpyMatrixspsens = [psensdfs[dataframe].as_matrix() for dataframe in xrange(len(psensdfs))]
+            psensdfs = [pd.concat([t[0][x],t[1][x]],ignore_index=True,axis = 1) for x in range(len(tempTlst))]                
+            numpyMatrixspsens = [psensdfs[dataframe].as_matrix() for dataframe in range(len(psensdfs))]
             interpolatedTemperatureForMappingPhysicalSens = [interpolatedTemperatureForMappingPhysicalSensT + interpolatedTemperatureForMappingPhysicalSensP]
             interpolatedPressureForMappingPhysicalSens = [interpolatedPressureForMappingPhysicalSensT + interpolatedPressureForMappingPhysicalSensP ]     
             concentrationOfAbsorbanceObservablesForSens = [concentrationOfAbsorbanceObservablesForSensT+concentrationOfAbsorbanceObservablesForSensP]
@@ -361,8 +362,8 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
         elif 'T'in physical_params and 'X' in physical_params:
             t = [tempTlst,tempXlsts]
             psensIndex = [timeHistory['time'].as_matrix(),['T'] + physicalParamsSpecies ,observables]
-            psensdfs = [pd.concat([t[0][x],t[1][x]], ignore_index = True, axis = 1) for x in xrange(len(tempTlst))]
-            numpyMatrixspsens = [psensdfs[dataframe].as_matrix() for dataframe in xrange(len(psensdfs))]
+            psensdfs = [pd.concat([t[0][x],t[1][x]], ignore_index = True, axis = 1) for x in range(len(tempTlst))]
+            numpyMatrixspsens = [psensdfs[dataframe].as_matrix() for dataframe in range(len(psensdfs))]
             interpolatedTemperatureForMappingPhysicalSens = [interpolatedTemperatureForMappingPhysicalSensT + interpolatedTemperatureForMappingPhysicalSensX]
             interpolatedPressureForMappingPhysicalSens = [interpolatedPressureForMappingPhysicalSensT +interpolatedPressureForMappingPhysicalSensX] 
             concentrationOfAbsorbanceObservablesForSens = [concentrationOfAbsorbanceObservablesForSensT+concentrationOfAbsorbanceObservablesForSensX]
@@ -372,8 +373,8 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
         elif 'P'in physical_params and 'X' in physical_params:
             t = [tempPlst,tempXlsts]
             psensIndex = [timeHistory['time'].as_matrix(),['P'] + physicalParamsSpecies ,observables]
-            psensdfs = [pd.concat([t[0][x],t[1][x]], ignore_index = True, axis = 1) for x in xrange(len(tempPlst))]
-            numpyMatrixspsens = [psensdfs[dataframe].as_matrix() for dataframe in xrange(len(psensdfs))]
+            psensdfs = [pd.concat([t[0][x],t[1][x]], ignore_index = True, axis = 1) for x in range(len(tempPlst))]
+            numpyMatrixspsens = [psensdfs[dataframe].as_matrix() for dataframe in range(len(psensdfs))]
             interpolatedTemperatureForMappingPhysicalSens = [interpolatedTemperatureForMappingPhysicalSensP + interpolatedTemperatureForMappingPhysicalSensX]
             interpolatedPressureForMappingPhysicalSens = [interpolatedPressureForMappingPhysicalSensP + interpolatedPressureForMappingPhysicalSensX]
             concentrationOfAbsorbanceObservablesForSens = [concentrationOfAbsorbanceObservablesForSensP+concentrationOfAbsorbanceObservablesForSensX]
@@ -383,7 +384,7 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
         elif 'T' in physical_params:
             t = [tempTlst]
             psensIndex = [timeHistory['time'].as_matrix(),['T'],observables]
-            numpyMatrixspsens = [tempTlst[dataframe].as_matrix() for dataframe in xrange(len(tempTlst))]
+            numpyMatrixspsens = [tempTlst[dataframe].as_matrix() for dataframe in range(len(tempTlst))]
             interpolatedTemperatureForMappingPhysicalSens = [interpolatedTemperatureForMappingPhysicalSensT]
             interpolatedPressureForMappingPhysicalSens = [interpolatedPressureForMappingPhysicalSensT ]
             concentrationOfAbsorbanceObservablesForSens = [concentrationOfAbsorbanceObservablesForSensT]
@@ -393,7 +394,7 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
         elif 'P' in physical_params:
             t = [tempPlst]
             psensIndex = [timeHistory['time'].as_matrix(),['P'],observables]
-            numpyMatrixspsens = [tempPlst[dataframe].as_matrix() for dataframe in xrange(len(tempPlst))]
+            numpyMatrixspsens = [tempPlst[dataframe].as_matrix() for dataframe in range(len(tempPlst))]
             interpolatedTemperatureForMappingPhysicalSens = [interpolatedTemperatureForMappingPhysicalSensP ]
             interpolatedPressureForMappingPhysicalSens = [interpolatedPressureForMappingPhysicalSensP ]
             concentrationOfAbsorbanceObservablesForSens = [concentrationOfAbsorbanceObservablesForSensP]
@@ -403,7 +404,7 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
         elif 'X' in physical_params:
             t = [tempXlsts]
             psensIndex = [timeHistory['time'].as_matrix(),[physicalParamsSpecies],observables]
-            numpyMatrixspsens = [tempXlsts[dataframe].as_matrix() for dataframe in xrange(len(tempXlsts))]
+            numpyMatrixspsens = [tempXlsts[dataframe].as_matrix() for dataframe in range(len(tempXlsts))]
             interpolatedTemperatureForMappingPhysicalSens = [interpolatedTemperatureForMappingPhysicalSensX]
             interpolatedPressureForMappingPhysicalSens = [interpolatedPressureForMappingPhysicalSensX]
             concentrationOfAbsorbanceObservablesForSens = [concentrationOfAbsorbanceObservablesForSensX]
@@ -434,3 +435,22 @@ def ShockTube(ctiFile,speciesNames,pressure,temperature,conditions,
     if physical_sens == 0 and kinetic_sens == 0:
         results = simulations.model_data('Shock-Tube',Solution = timeHistory)
         return results
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
