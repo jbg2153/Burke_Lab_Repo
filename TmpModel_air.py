@@ -10,6 +10,7 @@ import matplotlib as mpl
 from pylab import savefig
 import pandas as pd
 
+#establish parameters
 ctiFile = 'mecph_v2b.cti'
 speciesNames = ['ar']
 pressure = 15 #atm
@@ -25,16 +26,17 @@ thermalBoundary = 'adiabatic'
 observables = ['co','ch4','h2o','c2h4','ch2o','po[ome]3','co2','oh']
 physicalParams = list()
 kinetic_sens = 1 #default = 0
-physical_sense = 0 #default = 0
+physical_sens = 0 #default = 0
 reactorType = 'cv' #default = 'cv'        
 
+#create output object
 output = shock.ShockTube(ctiFile,speciesNames,pressure,temperature,concentrations,
               initialTime,finalTime,thermalBoundary,observables,
-              physical_params, kinetic_sens, physical_sens,
+              physicalParams, kinetic_sens, physical_sens,
               reactorType)
 
 
-## Plot species concentrations
+### Plot species concentrations ###
 output.solution.set_index('time',inplace=True)
 defaults = mpl.rcParamsDefault['figure.figsize']
 mpl.rcParams['figure.figsize'] = [5*defaults[0],4*defaults[1]]
@@ -43,11 +45,12 @@ output.solution[observables].plot(
         ylim=(0.00001, .1),
         linewidth=3
         )
-savefig('test_plot_air', bbox_inches='tight')
+mpl.pyplot.title('Plot of Mole Fractions for TMP Pyrolysis with Air as Diluent')
+savefig('concentration_plot_air', bbox_inches='tight')
 
 
-## Sensitivity analysis - output is a dict with species keys and
-    ## sensitivity dataframes for values
+### Sensitivity analysis - output is a dict with species keys and
+    # sensitivity dataframes for values ###
 
 def sens_results(obs, specArray, timeSeries):
     '''
