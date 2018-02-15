@@ -12,6 +12,7 @@ import pandas as pd
 
 #establish paramters
 ctiFile = 'mecph_v2b.cti'
+mech = 'incineration_Glaude'
 speciesNames = ['ar']
 pressure = 15 #atm
 temperature = 1500 #Kelvin
@@ -29,10 +30,10 @@ physical_sens = 0 #default = 0
 reactorType = 'cv' #default = 'cv'        
 
 #create output object
-output = shock.ShockTube(ctiFile,speciesNames,pressure,temperature,concentrations,
-              initialTime,finalTime,thermalBoundary,observables,
-              physicalParams, kinetic_sens, physical_sens,
-              reactorType)
+output = shock.ShockTube(ctiFile,speciesNames,pressure,temperature,
+                         concentrations,initialTime,finalTime,thermalBoundary,
+                         observables,physicalParams, kinetic_sens,
+                         physical_sens,reactorType)
 
 
 ### Plot species concentrations ###
@@ -45,7 +46,7 @@ output.solution[observables].plot(
         linewidth=3
         )
 mpl.pyplot.title('Plot of Mole Fractions for TMP Pyrolysis with Argon as Diluent')
-savefig('concentration_plot_argon', bbox_inches='tight')
+savefig('mole_fraction_plot_argon_'+mech, bbox_inches='tight')
 
 
 ### Sensitivity analysis - output is a dict with species keys and
@@ -55,7 +56,7 @@ def sens_results(obs, specArray, timeSeries):
     '''
     return dataframe with sensitivities for a given species by reaction and time
     
-    obs: observable species for sensitivity analysis
+    obs: (str) observable species for sensitivity analysis
     specArray: 3D numpy array with sensitivities by species, reaction, and time
     timeSeries: dataframe with times for each datapoint and index that will merge
         with sensitivities dataframe (df_sens)
@@ -90,4 +91,28 @@ timeSeries.rename(columns={0:'time'}, inplace=True)
 
 #iterate through each observable and populate obs_dict
 for o in observables:
-    obs_dict[o] = sens_results(o,output,timeSeries)
+    # [0] index for each value is the data frame with all reaction sensitivities
+    obs_dict[o] = [sens_results(o,output,timeSeries)]
+    # [1] index is a data frame with the 20 reactions with the highest max 
+        #sensitivities and those reactions max and min sensitivity values
+    max_sens = obs_dict[o][0].max(axis=0).sort_values(ascending=False)[0:10].reset_index()
+    min_sens = obs_dict[o][0].min(axis=0).reset_index()
+    combined_sens = pd.merge(
+        max_sens,
+        min_sens,
+        how='left',
+        on='index'
+    )
+    combined_sens.columns = ['reaction','max_sensitivity','min_sensitivity']
+    obs_dict[o].append(combined_sens)
+    # [2] index contains time series reaction sensitivities from [0] but only 
+        #for the reactions in [1]
+    react_list = ['time'] #to get time back in
+    react_list += obs_dict[o][1]['reaction'].tolist()
+    temp_df = obs_dict[o][0][react_list]#.set_index('time',inplace=True)
+    temp_df.set_index('time',inplace=True)
+    obs_dict[o].append(temp_df)
+    # save time series plot for each species
+    obs_dict[o][2].plot(linewidth=3)
+    mpl.pyplot.title('Plot of Reaction Sensitivities to %s for TMP Pyrolysis with Argon as Diluent' %(o))
+    savefig(o + '_sensitivites_plot_argon_'+mech, bbox_inches='tight')
